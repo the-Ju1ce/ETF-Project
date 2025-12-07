@@ -7,8 +7,7 @@ struct ContentView: View {
     @State private var sortOption: SortOption = .score
     @State private var searchText: String = ""
     @State private var showPaywall = false
-    @State private var showContact = false
-    @State private var showDisclaimer = false
+    @State private var showSettings = false
     
     enum SortOption: String, CaseIterable {
         case score = "Score"
@@ -128,63 +127,6 @@ struct ContentView: View {
                                 ETFRowView(etf: etf, shares: Int(shares) ?? 100)
                             }
                         }
-                        
-                        // Disclaimer and Contact at bottom
-                        Section {
-                            VStack(spacing: 12) {
-                                // Disclaimer banner
-                                Button(action: { showDisclaimer = true }) {
-                                    HStack {
-                                        Image(systemName: "exclamationmark.shield.fill")
-                                            .foregroundColor(.brandGreen)
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Not Financial Advice")
-                                                .font(.caption)
-                                                .bold()
-                                                .foregroundColor(.primary)
-                                            Text("Tap to read full disclaimer")
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding(12)
-                                    .background(Color.brandGreen.opacity(0.1))
-                                    .cornerRadius(8)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                // Contact button
-                                Button(action: { showContact = true }) {
-                                    HStack {
-                                        Image(systemName: "envelope.fill")
-                                            .foregroundColor(.brandGreen)
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Contact Us")
-                                                .font(.caption)
-                                                .bold()
-                                                .foregroundColor(.primary)
-                                            Text("Questions or feedback")
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding(12)
-                                    .background(Color.brandGreen.opacity(0.1))
-                                    .cornerRadius(8)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            .listRowInsets(EdgeInsets())
-                            .listRowBackground(Color.clear)
-                        }
                     }
                     .listStyle(PlainListStyle())
                     .searchable(
@@ -210,23 +152,27 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if subscriptionManager.canAccessFeature(.calendar) {
                         NavigationLink(destination: CalendarView(etfs: dataManager.etfs)) {
-                            Label("Calendar", systemImage: "calendar")
+                            Image(systemName: "calendar")
                         }
                     } else {
                         Button(action: { showPaywall = true }) {
-                            Label("Calendar", systemImage: "lock.fill")
+                            Image(systemName: "lock.fill")
                         }
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.brandGreen)
                     }
                 }
             }
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
-            .sheet(isPresented: $showContact) {
-                ContactView()
-            }
-            .sheet(isPresented: $showDisclaimer) {
-                DisclaimerView()
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
         }
         .onChange(of: sortOption) { newValue in
